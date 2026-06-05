@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Sol.Grab;
 
 namespace Player
 {
@@ -51,6 +52,9 @@ namespace Player
 
         private void Look()
         {
+            if (GrabManager.Instance != null && GrabManager.Instance.HeldObject != null && GrabManager.Instance.rotationMode)
+                return;
+
             Vector2 look = actions.Player.Look.ReadValue<Vector2>() * mouseSensitivity;
 
             transform.Rotate(Vector3.up * look.x);

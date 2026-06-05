@@ -76,7 +76,6 @@ namespace Sol.Grab
         private InputAction _grabAction;
         private float _currentHoldDistance;
         private Vector2 _scrollInput;
-        private Vector2 _lastMousePosition;
         private bool _previousFrozenState;
 
         private struct FrozenObjectData
@@ -142,6 +141,7 @@ namespace Sol.Grab
             }
 
             UpdateHoveredObject();
+            PollMouseShortcuts();
 
             if (_heldObject != null && Mathf.Abs(_scrollInput.y) > 0.01f)
             {
@@ -181,8 +181,6 @@ namespace Sol.Grab
             _grabAction.canceled += OnGrabInputCanceled;
             _actions.UI.ScrollWheel.performed += OnScroll;
             _actions.UI.ScrollWheel.canceled += OnScroll;
-            _actions.UI.RightClick.started += OnRClick;
-            _actions.UI.MiddleClick.started += OnMClick;
         }
 
         private void UnhookInput()
@@ -199,8 +197,6 @@ namespace Sol.Grab
 
             _actions.UI.ScrollWheel.performed -= OnScroll;
             _actions.UI.ScrollWheel.canceled -= OnScroll;
-            _actions.UI.RightClick.started -= OnRClick;
-            _actions.UI.MiddleClick.started -= OnMClick;
         }
 
         private void OnGrabInputStarted(InputAction.CallbackContext context)
@@ -221,10 +217,20 @@ namespace Sol.Grab
             _scrollInput = context.ReadValue<Vector2>();
         }
 
-        private void OnRClick(InputAction.CallbackContext context)
+        private void PollMouseShortcuts()
         {
-            if (!isLockingEnabled) return;
+            if (Mouse.current == null)
+                return;
 
+            if (isLockingEnabled && Mouse.current.rightButton.wasPressedThisFrame)
+                ToggleLockTarget();
+
+            if (allowMiddleClickRotationToggle && Mouse.current.middleButton.wasPressedThisFrame)
+                rotationMode = !rotationMode;
+        }
+
+        private void ToggleLockTarget()
+        {
             GrabbableComponent target = _heldObject != null ? _heldObject : _hoveredObject;
             if (target == null)
                 return;
@@ -233,12 +239,6 @@ namespace Sol.Grab
                 UnfreezeObject(target);
             else
                 FreezeObject(target);
-        }
-
-        private void OnMClick(InputAction.CallbackContext context)
-        {
-            if (allowMiddleClickRotationToggle)
-                rotationMode = !rotationMode;
         }
 
         private void UpdateHoveredObject()
@@ -285,9 +285,6 @@ namespace Sol.Grab
             Vector3 origin = GetHoldDistanceOrigin(cam);
             _currentHoldDistance = Vector3.Distance(origin, grabbable.transform.position);
 
-            if (Mouse.current != null)
-                _lastMousePosition = Mouse.current.position.ReadValue();
-
             _heldObject.OnGrab();
         }
 
@@ -304,18 +301,12 @@ namespace Sol.Grab
 
         private void RotateHeldObject(Camera activeCamera)
         {
-            if (Mouse.current == null)
+            Vector2 look = _actions.Player.Look.ReadValue<Vector2>();
+            if (look.sqrMagnitude <= 0.01f)
                 return;
 
-            Vector2 mousePos = Mouse.current.position.ReadValue();
-            Vector2 mouseDelta = mousePos - _lastMousePosition;
-            _lastMousePosition = mousePos;
-
-            if (mouseDelta.sqrMagnitude <= 0.01f)
-                return;
-
-            Quaternion yawRotation = Quaternion.AngleAxis(mouseDelta.x * rotationSensitivity, Vector3.up);
-            Quaternion pitchRotation = Quaternion.AngleAxis(-mouseDelta.y * rotationSensitivity, activeCamera.transform.right);
+            Quaternion yawRotation = Quaternion.AngleAxis(look.x * rotationSensitivity, Vector3.up);
+            Quaternion pitchRotation = Quaternion.AngleAxis(-look.y * rotationSensitivity, activeCamera.transform.right);
             _heldObject.transform.rotation = yawRotation * pitchRotation * _heldObject.transform.rotation;
         }
 
