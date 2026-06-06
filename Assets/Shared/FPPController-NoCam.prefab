@@ -121,7 +121,7 @@ GameObject:
   - component: {fileID: 8295282825389362197}
   - component: {fileID: 8861423841737197292}
   m_Layer: 3
-  m_Name: FPPController
+  m_Name: FPPController-NoCam
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

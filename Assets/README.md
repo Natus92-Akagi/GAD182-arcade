@@ -1,15 +1,42 @@
-# Technical Design Document
+# Liminal Arcade
 
-## Liminal Arcade Microgame Collection
+Group Unity project containing a shared arcade hub and each team member's microgame work.
 
-## 1. Project Overview
+## Project
 
-This project is a group-made microgame collection set inside a liminal, maze-like arcade. The player explores an unusual arcade space and finds arcade machines scattered throughout the maze. Each arcade machine launches a different microgame made by a member of the team.
+- Unity: `6000.0.76f1`
+- Rendering: Universal Render Pipeline
+- Input: Unity Input System
+- Main scene: `Assets/Shared/Scenes/Sc_ArcadeExterior.unity`
+- Input actions: `Assets/Shared/InputSystem_Actions.inputactions`
 
-The main reason for using this structure is that it gives the project a shared identity while still allowing each student to work on a clearly defined part of the game. Instead of making several disconnected minigames, the arcade hub ties everything together into one playable experience.
+## Asset Ownership
 
-As the technical lead, my role is to help make sure the project stays organised, buildable, and realistic for our team’s current skill level and available time. The goal is not to overcomplicate the project, but to create a working Unity build where the player can enter the arcade, play the microgames, and return to the hub without the game breaking.
+- `Assets/Shared`: systems and assets used by the full project.
+- `Assets/Diego`, `Assets/Finn`, `Assets/Jd`, `Assets/Josh`: member-owned work.
 
-The final project should launch from one executable Unity build.
+Keep work in your own folder until it needs to be shared. Check with the team before changing another member's files or shared systems.
 
----
+## Shared Player
+
+The shared player uses `Player.FppController` and `Assets/Shared/FPPController-NoCam.prefab`.
+
+- Move: `WASD` or arrow keys
+- Look: mouse
+- Jump: `Space`
+- Sprint: `Left Shift`
+- Interact: `E`
+- Grab: hold left mouse button
+- Adjust held distance: mouse wheel
+- Freeze aimed grabbable: right mouse button
+- Toggle held-object rotation: middle mouse button
+
+Keep the gameplay camera tagged `MainCamera`; the grab and outline systems use `Camera.main` as a fallback.
+
+## JD System Guides
+
+- `Assets/Jd/Scripts/MazeGen/README MazeGen.md`
+- `Assets/Jd/Scripts/PhysGrab/README PhysGrab.md`
+- `Assets/Jd/Scripts/Outline/README Outline.md`
+
+Before making a build, add every required scene to the Build Profiles scene list and test the final executable.

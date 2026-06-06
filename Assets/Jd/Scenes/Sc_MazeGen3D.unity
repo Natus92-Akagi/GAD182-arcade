@@ -267,7 +267,7 @@ GameObject:
   - component: {fileID: 1767342975}
   - component: {fileID: 1767342976}
   m_Layer: 0
-  m_Name: DunGen
+  m_Name: Generator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -300,9 +300,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6610e72bd102ca949aa400c3bf1aef7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  possibleRoomPrefabs:
+  - {fileID: 6010777708736884214, guid: 914f32a7979e05e4897d034009a196c3, type: 3}
+  - {fileID: 6010777708736884214, guid: 32101f2dd7f54a249b93f8d3848f38d0, type: 3}
+  - {fileID: 6010777708736884214, guid: a1282c3190860874f9cecf5e4045bfe1, type: 3}
   roomPrefab: {fileID: 6010777708736884214, guid: a5bd50f1af7e01f458024c3501159b76, type: 3}
-  numX: 10
-  numZ: 10
+  numX: 3
+  numZ: 14
 --- !u!1 &1774776355
 GameObject:
   m_ObjectHideFlags: 0
