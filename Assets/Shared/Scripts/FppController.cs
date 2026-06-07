@@ -1,89 +1,217 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
-using Sol.Grab;
 
 namespace Player
 {
     [RequireComponent(typeof(CharacterController))]
-    public class FppController : MonoBehaviour
+    public partial class FppController : MonoBehaviour
     {
-        [SerializeField] private Transform cameraRoot;
+        private const int PlayerLayerIndex = 3;
+        private const int AllLayersExceptPlayer = ~(1 << PlayerLayerIndex);
+        private const float MeaningfulMovementInput = 0.1f;
+        private const float MeaningfulMovementInputSquared = MeaningfulMovementInput * MeaningfulMovementInput;
+
+        [Header("Movement")]
         [SerializeField] private float walkSpeed = 5f;
         [SerializeField] private float sprintSpeed = 8f;
-        [SerializeField] private float mouseSensitivity = 0.12f;
+        [SerializeField] private float acceleration = 35f;
+        [SerializeField] private float deceleration = 45f;
+        [SerializeField] private float airAcceleration = 12f;
+        [SerializeField] private float characterTurnSpeed = 720f;
+
+        [Header("Jump")]
         [SerializeField] private float jumpHeight = 1.2f;
         [SerializeField] private float gravity = -20f;
+        [SerializeField] private float fallGravityMultiplier = 1.8f;
+        [SerializeField] private float lowJumpGravityMultiplier = 2.5f;
+        [SerializeField] private float coyoteTime = 0.12f;
+        [SerializeField] private float jumpBufferTime = 0.12f;
 
-        private CharacterController controller;
-        private InputSystem_Actions actions;
-        private Vector3 verticalVelocity;
-        private float cameraPitch;
+        [Header("Grounding")]
+        [SerializeField] private LayerMask groundLayers = AllLayersExceptPlayer;
+        [SerializeField] private float groundCheckDistance = 0.08f;
+        [SerializeField, Range(0.5f, 1f)] private float groundCheckRadiusScale = 0.9f;
+        [SerializeField] private float groundedVerticalSpeed = -2f;
+
+        private CharacterController characterController;
+        private InputSystem_Actions inputActions;
+        private Vector3 horizontalMovementVelocity;
+        private Quaternion cameraMovementFallbackHeading;
+        private float verticalSpeed;
+        private float coyoteTimeRemaining;
+        private float jumpBufferTimeRemaining;
+        private bool isGrounded;
 
         private void Awake()
         {
-            controller = GetComponent<CharacterController>();
-            actions = new InputSystem_Actions();
+            characterController = GetComponent<CharacterController>();
+            inputActions = new InputSystem_Actions();
+            cameraMovementFallbackHeading = Quaternion.Euler(0f, transform.eulerAngles.y, 0f);
+
+            InitializeCamera();
+
+            isGrounded = CheckGrounded();
         }
 
         private void OnEnable()
         {
-            actions.Player.Enable();
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            inputActions.Player.Enable();
+            EnableCamera();
         }
 
         private void OnDisable()
         {
-            actions.Player.Disable();
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            inputActions.Player.Disable();
+            DisableCamera();
         }
 
         private void OnDestroy()
         {
-            actions.Dispose();
+            inputActions.Dispose();
         }
 
         private void Update()
         {
-            Look();
-            Move();
+            UpdateCameraMode();
+            UpdateMovement();
         }
 
-        private void Look()
+        private void UpdateMovement()
         {
-            if (GrabManager.Instance != null && GrabManager.Instance.HeldObject != null && GrabManager.Instance.rotationMode)
+            isGrounded = verticalSpeed <= 0f && CheckGrounded();
+
+            if (AllowsJumping())
+            {
+                UpdateJumpTimers();
+                ApplyJump();
+            }
+            else
+            {
+                // Changing modes must not leave a stored jump ready for Platformer.
+                coyoteTimeRemaining = 0f;
+                jumpBufferTimeRemaining = 0f;
+            }
+
+            Vector2 movementInput = Vector2.ClampMagnitude(inputActions.Player.Move.ReadValue<Vector2>(), 1f);
+            bool isSprinting = inputActions.Player.Sprint.IsPressed() && HasValidSprintDirection(movementInput);
+            float movementSpeed = isSprinting ? sprintSpeed : walkSpeed;
+
+            Vector3 desiredMovementDirection = GetDesiredMovementDirection(movementInput);
+            Vector3 desiredMovementVelocity = desiredMovementDirection * movementSpeed;
+
+            if (desiredMovementDirection.sqrMagnitude > MeaningfulMovementInputSquared)
+            {
+                Quaternion movementFacingRotation = Quaternion.LookRotation(desiredMovementDirection);
+                transform.rotation = Quaternion.RotateTowards(
+                    transform.rotation,
+                    movementFacingRotation,
+                    characterTurnSpeed * Time.deltaTime);
+            }
+
+            float velocityChangeRate = isGrounded
+                ? (movementInput.sqrMagnitude > MeaningfulMovementInputSquared ? acceleration : deceleration)
+                : airAcceleration;
+
+            horizontalMovementVelocity = Vector3.MoveTowards(
+                horizontalMovementVelocity,
+                desiredMovementVelocity,
+                velocityChangeRate * Time.deltaTime);
+
+            if (isGrounded && verticalSpeed < 0f)
+                verticalSpeed = groundedVerticalSpeed;
+
+            // Modes without jumping still apply gravity so ledge falls finish naturally.
+            float gravityMultiplier = verticalSpeed < 0f
+                ? fallGravityMultiplier
+                : verticalSpeed > 0f && AllowsJumping() && !inputActions.Player.Jump.IsPressed()
+                    ? lowJumpGravityMultiplier
+                    : 1f;
+
+            verticalSpeed += gravity * gravityMultiplier * Time.deltaTime;
+            characterController.Move((horizontalMovementVelocity + Vector3.up * verticalSpeed) * Time.deltaTime);
+
+        }
+
+        private void UpdateJumpTimers()
+        {
+            // These short timers forgive a slightly late ledge jump or slightly early landing jump.
+            coyoteTimeRemaining = isGrounded
+                ? coyoteTime
+                : Mathf.Max(0f, coyoteTimeRemaining - Time.deltaTime);
+
+            jumpBufferTimeRemaining = inputActions.Player.Jump.WasPressedThisFrame()
+                ? jumpBufferTime
+                : Mathf.Max(0f, jumpBufferTimeRemaining - Time.deltaTime);
+        }
+
+        private void ApplyJump()
+        {
+            if (jumpBufferTimeRemaining <= 0f || coyoteTimeRemaining <= 0f)
                 return;
 
-            Vector2 look = actions.Player.Look.ReadValue<Vector2>() * mouseSensitivity;
-
-            transform.Rotate(Vector3.up * look.x);
-
-            cameraPitch -= look.y;
-            cameraPitch = Mathf.Clamp(cameraPitch, -85f, 85f);
-            cameraRoot.localEulerAngles = new Vector3(cameraPitch, 0f, 0f);
+            verticalSpeed = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            jumpBufferTimeRemaining = 0f;
+            coyoteTimeRemaining = 0f;
+            isGrounded = false;
         }
 
-        private void Move()
+        private bool CheckGrounded()
         {
-            Vector2 input = actions.Player.Move.ReadValue<Vector2>();
+            float groundCheckRadius = characterController.radius * groundCheckRadiusScale;
+            Vector3 groundCheckPosition = characterController.bounds.center +
+                                          Vector3.down * (characterController.bounds.extents.y -
+                                                          groundCheckRadius +
+                                                          groundCheckDistance);
 
-            float speed = actions.Player.Sprint.IsPressed() ? sprintSpeed : walkSpeed;
+            return Physics.CheckSphere(
+                groundCheckPosition,
+                groundCheckRadius,
+                groundLayers,
+                QueryTriggerInteraction.Ignore);
+        }
 
-            Vector3 move =
-                transform.right * input.x +
-                transform.forward * input.y;
+        private void GetMovementBasis(out Vector3 movementRight, out Vector3 movementForward)
+        {
+            Camera gameplayCamera = GetGameplayCamera();
+            if (gameplayCamera == null)
+            {
+                movementRight = transform.right;
+                movementForward = transform.forward;
+                return;
+            }
 
-            controller.Move(move * speed * Time.deltaTime);
+            // Flatten the output camera axes so looking vertically never creates vertical movement.
+            movementRight = Vector3.ProjectOnPlane(gameplayCamera.transform.right, Vector3.up).normalized;
+            movementForward = Vector3.ProjectOnPlane(gameplayCamera.transform.forward, Vector3.up).normalized;
 
-            if (controller.isGrounded && verticalVelocity.y < 0f)
-                verticalVelocity.y = -2f;
+            if (movementForward.sqrMagnitude < MeaningfulMovementInputSquared)
+                movementForward = cameraMovementFallbackHeading * Vector3.forward;
 
-            if (controller.isGrounded && actions.Player.Jump.WasPressedThisFrame())
-                verticalVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            if (movementRight.sqrMagnitude < MeaningfulMovementInputSquared)
+                movementRight = cameraMovementFallbackHeading * Vector3.right;
+        }
 
-            verticalVelocity.y += gravity * Time.deltaTime;
-            controller.Move(verticalVelocity * Time.deltaTime);
+        private bool AllowsJumping()
+        {
+            return cameraMode == CameraMode.Platformer;
+        }
+
+        private bool HasValidSprintDirection(Vector2 movementInput)
+        {
+            return cameraMode switch
+            {
+                CameraMode.Platformer => Mathf.Abs(movementInput.x) > MeaningfulMovementInput,
+                CameraMode.TopDown => movementInput.sqrMagnitude > MeaningfulMovementInputSquared,
+                _ => movementInput.y > MeaningfulMovementInput
+            };
+        }
+
+        private Vector3 GetDesiredMovementDirection(Vector2 movementInput)
+        {
+            GetMovementBasis(out Vector3 movementRight, out Vector3 movementForward);
+
+            return cameraMode == CameraMode.Platformer
+                ? movementRight * movementInput.x
+                : movementRight * movementInput.x + movementForward * movementInput.y;
         }
     }
 }
