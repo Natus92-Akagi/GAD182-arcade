@@ -362,7 +362,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1571693477555772038, guid: 7d36b4faa989578488e40c966b41fb5e, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
-      value: 
+      value:
       objectReference: {fileID: 2100000, guid: 697248abea674fc46ab855759ead8143, type: 2}
     - target: {fileID: 3575654310272563020, guid: 7d36b4faa989578488e40c966b41fb5e, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2717,15 +2717,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 441065333782150515, guid: 7daf2c754566460489fc6355359eabee, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 8.125238
+      value: 7.74
       objectReference: {fileID: 0}
     - target: {fileID: 441065333782150515, guid: 7daf2c754566460489fc6355359eabee, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 7.961529
+      value: 1.73
       objectReference: {fileID: 0}
     - target: {fileID: 441065333782150515, guid: 7daf2c754566460489fc6355359eabee, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 31.74094
+      value: 32.27
       objectReference: {fileID: 0}
     - target: {fileID: 441065333782150515, guid: 7daf2c754566460489fc6355359eabee, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2755,17 +2755,37 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1916755111195717768, guid: 7daf2c754566460489fc6355359eabee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.25
+      objectReference: {fileID: 0}
     - target: {fileID: 3200894914929131648, guid: 7daf2c754566460489fc6355359eabee, type: 3}
       propertyPath: CollideAgainst.m_Bits
       value: 55
       objectReference: {fileID: 0}
-    - target: {fileID: 8861423841737197292, guid: 7daf2c754566460489fc6355359eabee, type: 3}
-      propertyPath: cameraMode
+    - target: {fileID: 5258710787579523452, guid: 7daf2c754566460489fc6355359eabee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8295282825389362197, guid: 7daf2c754566460489fc6355359eabee, type: 3}
+      propertyPath: m_Height
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 8295282825389362197, guid: 7daf2c754566460489fc6355359eabee, type: 3}
+      propertyPath: m_Center.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8861423841737197292, guid: 7daf2c754566460489fc6355359eabee, type: 3}
+      propertyPath: cameraMode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8861423841737197292, guid: 7daf2c754566460489fc6355359eabee, type: 3}
+      propertyPath: crosshairObject
+      value:
+      objectReference: {fileID: 826487320}
     - target: {fileID: 8861423841737197292, guid: 7daf2c754566460489fc6355359eabee, type: 3}
       propertyPath: groundLayers.m_Bits
-      value: 55
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

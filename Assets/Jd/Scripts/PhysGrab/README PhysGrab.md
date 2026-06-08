@@ -24,7 +24,7 @@ Important `GrabManager` fields:
 
 - `Raycast Distance` and `Raycast Layer Mask`: control what can be reached. Exclude the `Player` layer.
 - `Grab Input`: `Attack` uses left click; `Interact` uses the interact action.
-- `Grab Mode`: use `Crosshair` for first-person play.
+- `Grab Mode`: use `Crosshair` for first-person play, or `Mouse` for cursor-driven modes.
 - `Scroll Sensitivity`: held-distance adjustment speed.
 - `Rotation Mode` and `Rotation Sensitivity`: held-object rotation.
 - `Is Locking Enabled`: allows right-click freezing.
@@ -53,9 +53,13 @@ Objects without `GrabbableComponent` are ignored.
 GrabManager.Instance.HeldObject;
 GrabManager.Instance.HoveredObject;
 GrabManager.Instance.ForceRelease();
+GrabManager.Instance.SetGrabMode(GrabMode.Mouse);
+GrabManager.Instance.CurrentGrabMode;
 ```
 
 Check `GrabManager.Instance` for `null` before using it.
+
+The shared `Player.Controller` changes grab mode automatically when camera modes swap. It also keeps grab distance at `10` for crosshair targeting and `30` for mouse targeting, so only call `SetGrabMode` yourself for custom one-off behaviour.
 
 ## Troubleshooting
 

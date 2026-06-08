@@ -446,6 +446,9 @@ MonoBehaviour:
   cameraMode: 0
   outputCamera: {fileID: 4076851992789199664}
   cameraBrain: {fileID: 1890470836294760506}
+  crosshairObject: {fileID: 0}
+  crosshairInteractionRayDistance: 10
+  mouseInteractionRayDistance: 30
   firstPersonCamera: {fileID: 2075801746549180560}
   thirdPersonCamera: {fileID: 871887797256112600}
   topDownCamera: {fileID: 8638040981264753661}

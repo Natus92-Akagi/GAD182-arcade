@@ -35,7 +35,7 @@ Important fields:
 
 - `Raycast Distance`: maximum detection distance.
 - `Detection Layer Mask`: detected layers. Exclude the `Player` layer.
-- `Ray Mode`: use `Crosshair` for first-person play.
+- `Ray Mode`: use `Crosshair` for first-person play, or `Mouse` for cursor-driven modes.
 
 ## Outlineable Setup
 
@@ -57,9 +57,13 @@ outline.ShowOutline();
 outline.HideOutline();
 
 OutlineManager.Instance.CurrentOutlinedObject;
+OutlineManager.Instance.SetRayMode(GrabMode.Mouse);
+OutlineManager.Instance.CurrentRayMode;
 ```
 
 Check `OutlineManager.Instance` for `null` before using it.
+
+The shared `Player.Controller` keeps outline ray mode matched to grab mode. It also keeps outline distance at `10` for crosshair targeting and `30` for mouse targeting, so both systems switch together.
 
 ## Troubleshooting
 

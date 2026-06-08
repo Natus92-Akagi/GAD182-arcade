@@ -23,7 +23,7 @@ The shared player uses `Player.Controller`, Cinemachine, and `Assets/Shared/Cont
 
 Setup, camera modes, tuning, and troubleshooting:
 
-- `Assets/Shared/Scripts/README Controller.md`
+- `Assets/Shared/Scripts/Controller/README Controller.md`
 
 - Move: `WASD` or arrow keys
 - Look: mouse
@@ -34,6 +34,7 @@ Setup, camera modes, tuning, and troubleshooting:
 - Adjust held distance: mouse wheel
 - Freeze aimed grabbable: right mouse button
 - Toggle held-object rotation: middle mouse button
+- Isometric pointer mode: hold `Left Alt`
 
 Keep the gameplay camera tagged `MainCamera`; the grab and outline systems use `Camera.main` as a fallback.
 

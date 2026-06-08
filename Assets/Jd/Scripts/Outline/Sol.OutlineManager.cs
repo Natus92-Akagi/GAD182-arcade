@@ -92,6 +92,9 @@ namespace Sol.Outline
                 _currentOutlinedObject.ShowOutline();
         }
 
+        public void SetRayMode(GrabMode mode) => rayMode = mode;
+
+        public GrabMode CurrentRayMode => rayMode;
         public OutlineComponent CurrentOutlinedObject => _currentOutlinedObject;
     }
 }

@@ -436,6 +436,9 @@ namespace Sol.Grab
 
         public void ForceRelease() => ReleaseHeldObject();
 
+        public void SetGrabMode(GrabMode mode) => grabMode = mode;
+
+        public GrabMode CurrentGrabMode => grabMode;
         public GrabbableComponent HeldObject => _heldObject;
         public GrabbableComponent HoveredObject => _hoveredObject;
         public int FrozenObjectCount => _frozenObjects.Count;
