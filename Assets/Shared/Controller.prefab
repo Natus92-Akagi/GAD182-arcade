@@ -243,7 +243,7 @@ MonoBehaviour:
       Enabled: 1
       Input:
         InputAction: {fileID: 11400000, guid: e59fb93beeb90a841b689687ad059af9, type: 2}
-        Gain: 1
+        Gain: -1
         CancelDeltaTime: 0
       InputValue: 0
       Driver:
@@ -382,7 +382,7 @@ GameObject:
   - component: {fileID: 8295282825389362197}
   - component: {fileID: 8861423841737197292}
   m_Layer: 3
-  m_Name: FPPController-NoCam
+  m_Name: Controller
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -451,6 +451,16 @@ MonoBehaviour:
   topDownCamera: {fileID: 8638040981264753661}
   isometricCamera: {fileID: 3255372164330922383}
   platformerCamera: {fileID: 5952395169390852308}
+  firstPersonMovementSpeedMultiplier: 1
+  firstPersonTurnSpeedMultiplier: 1
+  thirdPersonMovementSpeedMultiplier: 1
+  thirdPersonTurnSpeedMultiplier: 1
+  topDownMovementSpeedMultiplier: 1
+  topDownTurnSpeedMultiplier: 1
+  isometricMovementSpeedMultiplier: 1
+  isometricTurnSpeedMultiplier: 1
+  platformerMovementSpeedMultiplier: 1
+  platformerTurnSpeedMultiplier: 1
   mouseSensitivity: 0.12
   gamepadLookSpeed: 180
   walkSpeed: 5
@@ -1241,7 +1251,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62d54399b04b4fa48a73e121d4937dd4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ReferenceFrame: 1
+  ReferenceFrame: 2
   RecenterTarget: 0
   PanAxis:
     Value: 0
@@ -1296,7 +1306,7 @@ MonoBehaviour:
       Enabled: 1
       Input:
         InputAction: {fileID: 11400000, guid: e59fb93beeb90a841b689687ad059af9, type: 2}
-        Gain: 1
+        Gain: -1
         CancelDeltaTime: 0
       InputValue: 0
       Driver:

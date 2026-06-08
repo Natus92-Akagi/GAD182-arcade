@@ -19,7 +19,7 @@ Keep work in your own folder until it needs to be shared. Check with the team be
 
 ## Shared Player
 
-The shared player uses `Player.FppController`, Cinemachine, and `Assets/Shared/FPPController-NoCam.prefab`. It supports First Person, Third Person, Top Down, Isometric, and Platformer camera modes with movement rules linked to each mode.
+The shared player uses `Player.Controller`, Cinemachine, and `Assets/Shared/Controller.prefab`. It supports First Person, Third Person, Top Down, Isometric, and Platformer camera modes with movement rules and tuning linked to each mode.
 
 Setup, camera modes, tuning, and troubleshooting:
 
@@ -27,7 +27,7 @@ Setup, camera modes, tuning, and troubleshooting:
 
 - Move: `WASD` or arrow keys
 - Look: mouse
-- Jump: `Space` (Platformer mode only)
+- Jump: `Space` in First Person, Third Person, Isometric, and Platformer
 - Sprint: `Left Shift`
 - Interact: `E`
 - Grab: hold left mouse button

@@ -2755,9 +2755,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4684500389704870999, guid: 7daf2c754566460489fc6355359eabee, type: 3}
-      propertyPath: m_Name
-      value: FPPController
+    - target: {fileID: 3200894914929131648, guid: 7daf2c754566460489fc6355359eabee, type: 3}
+      propertyPath: CollideAgainst.m_Bits
+      value: 55
+      objectReference: {fileID: 0}
+    - target: {fileID: 8861423841737197292, guid: 7daf2c754566460489fc6355359eabee, type: 3}
+      propertyPath: cameraMode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8861423841737197292, guid: 7daf2c754566460489fc6355359eabee, type: 3}
+      propertyPath: groundLayers.m_Bits
+      value: 55
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
