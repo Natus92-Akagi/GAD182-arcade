@@ -27,23 +27,35 @@ namespace Sol.Grab
     /// </summary>
     public class GrabManager : MonoBehaviour
     {
+        [Header("Detection")]
         [Tooltip("Max raycast distance for grab detection.")]
         public float raycastDistance = 100f;
 
         [Tooltip("Layer mask for grab raycast.")]
         public LayerMask raycastLayerMask = Physics.DefaultRaycastLayers & ~(1 << 3);
 
+        [Tooltip("Mouse: ray from cursor. Crosshair: ray from screen center.")]
+        [SerializeField] private GrabMode grabMode = GrabMode.Crosshair;
+
+        [Tooltip("Camera used for crosshair and mouse raycasts. Falls back to Camera.main.")]
+        [SerializeField] private Camera gameplayCamera;
+
+        [Header("Input")]
+        [Tooltip("Input action used for grab hold/release.")]
+        [SerializeField] private GrabInputBinding grabInput = GrabInputBinding.Attack;
+
         [Tooltip("Enable grabbing functionality.")]
         public bool isGrabbingEnabled = true;
-
-        [Tooltip("Scroll wheel sensitivity for adjusting hold distance.")]
-        public float scrollSensitivity = 0.5f;
 
         [Tooltip("Allow objects to be frozen with right click.")]
         public bool isLockingEnabled = true;
 
         [Tooltip("Allow middle click to toggle rotation mode while playing.")]
         public bool allowMiddleClickRotationToggle = true;
+
+        [Header("Held Object")]
+        [Tooltip("Scroll wheel sensitivity for adjusting hold distance.")]
+        public float scrollSensitivity = 0.5f;
 
         [Tooltip("Master toggle: freeze/unfreeze all grabbable objects.")]
         public bool isFrozen = false;
@@ -53,15 +65,6 @@ namespace Sol.Grab
 
         [Tooltip("Rotation sensitivity for mouse movement.")]
         public float rotationSensitivity = 2f;
-
-        [Tooltip("Input action used for grab hold/release.")]
-        [SerializeField] private GrabInputBinding grabInput = GrabInputBinding.Attack;
-
-        [Tooltip("Mouse: ray from cursor. Crosshair: ray from screen center.")]
-        [SerializeField] private GrabMode grabMode = GrabMode.Crosshair;
-
-        [Tooltip("Camera used for crosshair and mouse raycasts. Falls back to Camera.main.")]
-        [SerializeField] private Camera gameplayCamera;
 
         [Tooltip("Camera: hold distance is measured from camera. Transform: use Hold Origin if assigned.")]
         [SerializeField] private HoldDistanceOrigin holdDistanceOrigin = HoldDistanceOrigin.Camera;
@@ -78,6 +81,13 @@ namespace Sol.Grab
         private Vector2 _scrollInput;
         private bool _previousFrozenState;
 
+        public static GrabManager Instance { get; private set; }
+
+        public GrabMode CurrentGrabMode => grabMode;
+        public GrabbableComponent HeldObject => _heldObject;
+        public GrabbableComponent HoveredObject => _hoveredObject;
+        public int FrozenObjectCount => _frozenObjects.Count;
+
         private struct FrozenObjectData
         {
             public GrabbableComponent component;
@@ -87,7 +97,30 @@ namespace Sol.Grab
             public RigidbodyConstraints constraints;
         }
 
-        public static GrabManager Instance { get; private set; }
+        public GrabbableComponent GetFrozenObject(int index) => _frozenObjects[index].component;
+
+        public void ForceRelease() => ReleaseHeldObject();
+
+        public void SetGrabMode(GrabMode mode) => grabMode = mode;
+
+        public Ray GetAimRay(Camera cam)
+        {
+            if (grabMode == GrabMode.Mouse && Mouse.current != null)
+                return cam.ScreenPointToRay(Mouse.current.position.ReadValue());
+
+            return cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+        }
+
+        public bool IsAimingAtGrabbable()
+        {
+            Camera activeCamera = GetActiveGameplayCamera();
+            if (activeCamera == null)
+                return false;
+
+            Ray ray = GetAimRay(activeCamera);
+            return Physics.Raycast(ray, out RaycastHit hit, raycastDistance, raycastLayerMask, QueryTriggerInteraction.Ignore)
+                && ResolveGrabbable(hit) != null;
+        }
 
         private void Awake()
         {
@@ -327,14 +360,6 @@ namespace Sol.Grab
             return activeCamera != null ? activeCamera.transform.position : Vector3.zero;
         }
 
-        private Ray GetAimRay(Camera cam)
-        {
-            if (grabMode == GrabMode.Mouse && Mouse.current != null)
-                return cam.ScreenPointToRay(Mouse.current.position.ReadValue());
-
-            return cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-        }
-
         private Camera GetActiveGameplayCamera()
         {
             return gameplayCamera != null ? gameplayCamera : Camera.main;
@@ -369,6 +394,7 @@ namespace Sol.Grab
             if (obj == _heldObject)
                 ReleaseHeldObject();
 
+            // Save physics settings so unlocking restores authored behavior.
             _frozenObjects.Add(new FrozenObjectData
             {
                 component = obj,
@@ -433,15 +459,5 @@ namespace Sol.Grab
 
             _frozenObjects.Clear();
         }
-
-        public void ForceRelease() => ReleaseHeldObject();
-
-        public void SetGrabMode(GrabMode mode) => grabMode = mode;
-
-        public GrabMode CurrentGrabMode => grabMode;
-        public GrabbableComponent HeldObject => _heldObject;
-        public GrabbableComponent HoveredObject => _hoveredObject;
-        public int FrozenObjectCount => _frozenObjects.Count;
-        public GrabbableComponent GetFrozenObject(int index) => _frozenObjects[index].component;
     }
 }

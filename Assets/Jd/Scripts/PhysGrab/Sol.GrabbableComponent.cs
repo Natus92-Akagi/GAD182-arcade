@@ -8,6 +8,7 @@ namespace Sol.Grab
     [RequireComponent(typeof(Collider))]
     public class GrabbableComponent : MonoBehaviour
     {
+        [Header("Hold")]
         [Tooltip("Hold distance from the camera when grabbed")]
         [Range(0.5f, 20f)]
         public float holdDistance = 3f;

@@ -9,6 +9,7 @@ namespace Sol.Outline
     /// </summary>
     public class OutlineManager : MonoBehaviour
     {
+        [Header("Detection")]
         [Tooltip("Max raycast distance for hover detection.")]
         public float raycastDistance = 100f;
 
@@ -24,6 +25,10 @@ namespace Sol.Outline
         private OutlineComponent _currentOutlinedObject;
 
         public static OutlineManager Instance { get; private set; }
+        public GrabMode CurrentRayMode => rayMode;
+        public OutlineComponent CurrentOutlinedObject => _currentOutlinedObject;
+
+        public void SetRayMode(GrabMode mode) => rayMode = mode;
 
         private void Awake()
         {
@@ -67,14 +72,6 @@ namespace Sol.Outline
             SetOutlinedObject(hoveredComponent);
         }
 
-        private Ray GetAimRay(Camera cam)
-        {
-            if (rayMode == GrabMode.Mouse && Mouse.current != null)
-                return cam.ScreenPointToRay(Mouse.current.position.ReadValue());
-
-            return cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-        }
-
         /// <summary>
         /// Manually set which object should have an outline. Pass null to clear.
         /// </summary>
@@ -92,9 +89,12 @@ namespace Sol.Outline
                 _currentOutlinedObject.ShowOutline();
         }
 
-        public void SetRayMode(GrabMode mode) => rayMode = mode;
+        private Ray GetAimRay(Camera cam)
+        {
+            if (rayMode == GrabMode.Mouse && Mouse.current != null)
+                return cam.ScreenPointToRay(Mouse.current.position.ReadValue());
 
-        public GrabMode CurrentRayMode => rayMode;
-        public OutlineComponent CurrentOutlinedObject => _currentOutlinedObject;
+            return cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+        }
     }
 }

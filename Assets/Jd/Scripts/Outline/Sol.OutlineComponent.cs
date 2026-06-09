@@ -3,10 +3,11 @@ using UnityEngine;
 namespace Sol.Outline
 {
     /// Attach to any object that should be outlineable.
-    /// The SolOutlineRendererFeature handles all rendering — this component
+    /// The SolOutlineRendererFeature handles all rendering - this component
     /// just registers/unregisters itself and exposes the renderers.
     public class OutlineComponent : MonoBehaviour
     {
+        [Header("Appearance")]
         [Tooltip("Outline color for this object")]
         public Color outlineColor = new Color(1f, 0.5f, 0f, 1f);
 
