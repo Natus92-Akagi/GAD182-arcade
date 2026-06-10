@@ -456,7 +456,7 @@ MonoBehaviour:
   isometricCamera: {fileID: 3255372164330922383}
   isometricMovementSpeedMultiplier: 1
   isometricTurnSpeedMultiplier: 1
-  jumpHeight: 1.2
+  jumpHeight: 1.3
   lowJumpGravityMultiplier: 2.5
   coyoteTime: 0.12
   jumpBufferTime: 0.12
