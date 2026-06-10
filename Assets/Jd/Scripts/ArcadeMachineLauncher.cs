@@ -1,3 +1,4 @@
+using System;
 using Sol.Grab;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -128,11 +129,32 @@ namespace Sol.Arcade
                 return false;
 
             Ray ray = GetInteractionRay(activeCamera);
-            if (!Physics.Raycast(ray, out RaycastHit hit, interactDistance, interactLayerMask, QueryTriggerInteraction.Ignore))
-                return false;
+            RaycastHit[] hits = Physics.RaycastAll(
+                ray,
+                GetInteractionDistance(),
+                interactLayerMask,
+                QueryTriggerInteraction.Ignore);
 
-            Transform hitTransform = hit.collider.transform;
-            return hitTransform == transform || hitTransform.IsChildOf(transform);
+            Array.Sort(hits, (left, right) => left.distance.CompareTo(right.distance));
+            Transform playerRoot = activeCamera.transform.root;
+
+            foreach (RaycastHit hit in hits)
+            {
+                Transform hitTransform = hit.collider.transform;
+                if (hitTransform.IsChildOf(playerRoot))
+                    continue;
+
+                return hitTransform == transform || hitTransform.IsChildOf(transform);
+            }
+
+            return false;
+        }
+
+        private float GetInteractionDistance()
+        {
+            return GrabManager.Instance != null
+                ? Mathf.Max(interactDistance, GrabManager.Instance.raycastDistance)
+                : interactDistance;
         }
 
         private Ray GetInteractionRay(Camera activeCamera)

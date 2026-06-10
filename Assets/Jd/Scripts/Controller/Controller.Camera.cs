@@ -172,7 +172,7 @@ namespace Player
         {
             bool usesMouseInteraction = UsesMouseInteraction();
             GrabMode interactionMode = usesMouseInteraction ? GrabMode.Mouse : GrabMode.Crosshair;
-            float interactionRayDistance = usesMouseInteraction
+            float interactionRayDistance = usesMouseInteraction || cameraMode == CameraMode.Isometric
                 ? mouseInteractionRayDistance
                 : crosshairInteractionRayDistance;
 
@@ -221,7 +221,7 @@ namespace Player
 
         private static bool IsIsometricPointerModifierActive()
         {
-            return Keyboard.current?.leftAltKey.isPressed == true; // alt toggles pointer modifier
+            return Keyboard.current?.tabKey.isPressed == true; // hold tab for pointer interaction
         }
 
         private void ResetActiveCameraMode()

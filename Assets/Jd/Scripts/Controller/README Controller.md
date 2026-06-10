@@ -31,7 +31,7 @@ The controller automatically hides the Player layer in First Person and renders 
 - Jump: `Space` or gamepad south button in First Person, Third Person, Isometric, and Platformer
 - Sprint: `Left Shift` or gamepad left-stick press
 - Unlock or relock the cursor: `Escape`
-- Hold pointer mode in Isometric: `Left Alt`
+- Hold pointer mode in Isometric: `Tab`
 
 Grab-object rotation temporarily suppresses camera look, so mouse movement can rotate the held object instead.
 
@@ -61,7 +61,7 @@ Uses an orthographic `CinemachineOrbitalFollow` and `CinemachineRotationComposer
 
 The camera can orbit horizontally while its elevated angle stays fixed. Movement is camera-relative, sprint works forward, and jumping is enabled. It intentionally has no collision extension so the orthographic framing stays stable.
 
-By default, Isometric keeps the cursor locked and uses the crosshair for grab and outline rays. Hold `Left Alt` to pause orbit, show the cursor, hide the crosshair, and aim grab or outline rays from the mouse position.
+By default, Isometric keeps the cursor locked and uses the crosshair for grab and outline rays. Hold `Tab` to pause orbit, show the cursor, hide the crosshair, and aim grab or outline rays from the mouse position.
 
 ### Platformer
 
@@ -150,9 +150,9 @@ show the crosshair only when crosshair rays are active
 
 The output `FppCam` remains tagged `MainCamera`, so the grab and outline managers continue to raycast from the final Cinemachine-controlled view.
 
-First Person and Third Person use crosshair rays for both grab and outline. Top Down and Platformer use mouse-position rays. Isometric uses crosshair rays by default, then switches both grab and outline to mouse rays while `Left Alt` is held.
+First Person and Third Person use crosshair rays for both grab and outline. Top Down and Platformer use mouse-position rays. Isometric uses crosshair rays by default, then switches both grab and outline to mouse rays while `Tab` is held.
 
-Crosshair targeting keeps grab and outline ray distance at `10`. Mouse targeting raises both to `30`, which gives cursor-driven modes more room to click around the screen.
+First Person and Third Person crosshair targeting keeps grab and outline ray distance at `10`. Isometric and mouse targeting use `30`, which accounts for the overhead camera distance and gives cursor-driven modes more room to click around the screen.
 
 Assign `Crosshair Object` on the Controller if the scene has a crosshair UI. Missing references are fine; the controller just skips visibility changes.
 
@@ -163,7 +163,7 @@ Assign `Crosshair Object` on the Controller if the scene has a crosshair UI. Mis
 - Player is invisible outside First Person: make sure the Player layer is included in `FppCam`'s culling mask.
 - Multiple cameras fight: keep only one active shared player and output camera.
 - Mouse does not look: click the Game view or press `Escape` to relock the cursor.
-- Isometric mouse grabbing does not work: hold `Left Alt` so grab and outline switch from crosshair rays to mouse rays.
+- Isometric mouse grabbing does not work: hold `Tab` so grab and outline switch from crosshair rays to mouse rays.
 - Third Person clips through walls: check its Deoccluder and collision layers.
 - Third Person detects the player as a wall: exclude the Player layer and keep `Ignore Tag` set to `Player`.
 - Isometric pitch changes: keep its vertical input axis disabled and its vertical orbit range fixed.

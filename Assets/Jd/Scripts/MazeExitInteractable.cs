@@ -127,7 +127,7 @@ namespace Sol.Arcade
             Ray ray = GetInteractionRay(activeCamera);
             RaycastHit[] hits = Physics.RaycastAll(
                 ray,
-                interactDistance,
+                GetInteractionDistance(),
                 interactLayerMask,
                 QueryTriggerInteraction.Ignore);
 
@@ -141,6 +141,13 @@ namespace Sol.Arcade
             }
 
             return false;
+        }
+
+        private float GetInteractionDistance()
+        {
+            return GrabManager.Instance != null
+                ? Mathf.Max(interactDistance, GrabManager.Instance.raycastDistance)
+                : interactDistance;
         }
 
         private Ray GetInteractionRay(Camera activeCamera)
